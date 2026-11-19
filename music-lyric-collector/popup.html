@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      width: 380px;
+      padding: 0;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .container {
+      margin: 12px;
+      background: rgba(255,255,255,0.97);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    h3 {
+      margin: 0 0 12px 0;
+      color: #333;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      border-bottom: 2px solid #e9ecef;
+      margin-bottom: 12px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: #aaa;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Status card */
+    .status-card {
+      background: #f8f9fa;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #e9ecef;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .status-row:last-child { margin-bottom: 0; }
+    .status-label { font-weight: 600; color: #495057; font-size: 12px; }
+    .badge {
+      font-size: 11px; padding: 2px 8px; border-radius: 12px;
+      color: white; font-weight: 500;
+    }
+    .badge-ok { background: #28a745; }
+    .badge-no { background: #adb5bd; }
+    .badge-source { background: #6f42c1; }
+
+    /* Editable Song Inputs */
+    .edit-song-box {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .field-item {
+      margin-bottom: 8px;
+    }
+    .field-item:last-child {
+      margin-bottom: 0;
+    }
+    .field-item label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 3px;
+    }
+    .field-hint-tag {
+      font-size: 10px;
+      font-weight: normal;
+      color: #667eea;
+    }
+    .field-item input[type="text"] {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #212529;
+      background: #fafafa;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .field-item input[type="text"]:focus {
+      background: #fff;
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+
+    /* File preview */
+    .file-preview {
+      background: #f0f4ff;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      font-family: "Consolas", "Courier New", monospace;
+      word-break: break-all;
+      line-height: 1.4;
+      border-left: 3px solid #667eea;
+    }
+    .file-preview .fp-label {
+      font-size: 10px;
+      color: #667eea;
+      font-family: sans-serif;
+      margin-bottom: 2px;
+      font-weight: 600;
+    }
+
+    /* Progress */
+    .progress-wrap { display: none; margin-bottom: 10px; }
+    .progress-bar-bg {
+      height: 6px; background: #e9ecef; border-radius: 3px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 3px; transition: width 0.3s ease;
+    }
+    .progress-text {
+      font-size: 11px; color: #888; margin-top: 4px; text-align: center;
+    }
+
+    /* Buttons */
+    button {
+      width: 100%; padding: 10px; margin-top: 6px;
+      border: none; border-radius: 8px; cursor: pointer;
+      font-weight: 600; font-size: 13px;
+      transition: all 0.2s ease; letter-spacing: 0.3px;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    }
+    button:active:not(:disabled) { transform: translateY(0); }
+    .btn-scan { background: #17a2b8; color: white; }
+    .btn-download {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white; font-size: 14px; padding: 11px;
+    }
+    .btn-clear { background: #6c757d; color: white; font-size: 11px; padding: 6px; margin-top: 10px; }
+    button:disabled {
+      background: #ccc !important; cursor: not-allowed;
+      transform: none !important; box-shadow: none !important;
+    }
+
+    /* Settings */
+    .settings-group {
+      margin-bottom: 14px;
+    }
+    .settings-group label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: #495057; margin-bottom: 5px;
+    }
+    .settings-group input[type="text"] {
+      width: 100%; padding: 8px 10px; border: 1px solid #ced4da;
+      border-radius: 6px; font-size: 12px; color: #333;
+      outline: none; transition: border-color 0.2s;
+    }
+    .settings-group input[type="text"]:focus { border-color: #667eea; }
+    .settings-group .hint {
+      font-size: 10px; color: #999; margin-top: 3px; line-height: 1.4;
+    }
+
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0;
+    }
+    .toggle-row span { font-size: 12px; color: #495057; font-weight: 500; }
+    .toggle-switch {
+      position: relative; width: 40px; height: 22px; cursor: pointer;
+    }
+    .toggle-switch input { display: none; }
+    .toggle-slider {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: #ccc; border-radius: 11px; transition: 0.3s;
+    }
+    .toggle-slider::before {
+      content: ""; position: absolute; width: 16px; height: 16px;
+      left: 3px; bottom: 3px; background: white; border-radius: 50%;
+      transition: 0.3s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: #667eea; }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    .btn-save-settings {
+      background: #28a745; color: white; font-size: 12px; padding: 8px;
+    }
+
+    /* History */
+    .history-section { margin-top: 12px; border-top: 1px solid #e9ecef; padding-top: 10px; }
+    .history-title { font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; }
+    .history-item {
+      font-size: 11px; color: #555; padding: 4px 0;
+      border-bottom: 1px dotted #eee;
+      display: flex; justify-content: space-between;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .h-name { font-weight: 500; color: #333; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .h-source { color: #6f42c1; font-size: 10px; margin-left: 6px; white-space: nowrap; }
+
+    .footer {
+      text-align: center; font-size: 10px;
+      color: rgba(255,255,255,0.65); margin: 8px 0 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>🎵 Music & Lyric Collector v2</h3>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="tab-main">🎧 Thu thập</button>
+      <button class="tab-btn" data-tab="tab-settings">⚙️ Cài đặt</button>
+    </div>
+
+    <!-- ===================== TAB 1: MAIN ===================== -->
+    <div id="tab-main" class="tab-panel active">
+      <div class="status-card">
+        <div class="status-row">
+          <span class="status-label">🎧 Audio</span>
+          <span id="audio-badge" class="badge badge-no">Chưa bắt</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">📝 Lyric</span>
+          <span id="lyric-badge" class="badge badge-no">Chưa bắt</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">🌐 Nguồn</span>
+          <span id="source-badge" class="badge badge-no">—</span>
+        </div>
+      </div>
+
+      <!-- Khung nhập / chỉnh sửa tên bài hát và tác giả -->
+      <div class="edit-song-box">
+        <div class="field-item">
+          <label for="input-title">
+            <span>🏷️ Tên bài hát:</span>
+            <span class="field-hint-tag">có thể gõ sửa trực tiếp</span>
+          </label>
+          <input type="text" id="input-title" placeholder="Nhập tên bài hát (hoặc bấm Quét)..." autocomplete="off">
+        </div>
+        <div class="field-item">
+          <label for="input-artist">
+            <span>🎤 Tác giả / Ca sĩ:</span>
+            <span class="field-hint-tag">tùy chọn</span>
+          </label>
+          <input type="text" id="input-artist" placeholder="Nhập tên tác giả / ca sĩ..." autocomplete="off">
+        </div>
+      </div>
+
+      <!-- File preview -->
+      <div class="file-preview" id="file-preview">
+        <div class="fp-label">📁 Tên file sẽ lưu:</div>
+        <span id="preview-path">Chưa có thông tin...</span>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Đang chuẩn bị...</div>
+      </div>
+
+      <button id="btn-scan" class="btn-scan">🔍 Quét trang tự động</button>
+      <button id="btn-download" class="btn-download" disabled>📦 Tải trọn gói (1 file ZIP)</button>
+      <button id="btn-clear" class="btn-clear">🗑️ Xóa &amp; Bắt bài mới</button>
+
+      <!-- History -->
+      <div class="history-section" id="history-section" style="display:none">
+        <div class="history-title">📋 Đã tải gần đây</div>
+        <div id="history-list"></div>
+      </div>
+    </div>
+
+    <!-- ===================== TAB 2: SETTINGS ===================== -->
+    <div id="tab-settings" class="tab-panel">
+
+      <div class="settings-group">
+        <label>📂 Thư mục lưu file</label>
+        <input type="text" id="setting-folder" placeholder="dataset_music">
+        <div class="hint">
+          Đường dẫn thư mục con trong thư mục Downloads của bạn.<br>
+          Ví dụ: <code>dataset_music</code> → lưu tại <code>Downloads/dataset_music/</code><br>
+          Hoặc: <code>Music/dataset/vn</code> → lưu tại <code>Downloads/Music/dataset/vn/</code>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="toggle-row">
+          <span>💬 Hỏi vị trí lưu mỗi lần tải</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="setting-saveas">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="hint">
+          Bật: mỗi lần tải sẽ hiện hộp thoại "Save As" để bạn chọn thư mục bất kỳ trên máy.<br>
+          Tắt: tự động lưu vào thư mục đã cài đặt ở trên.
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <label>📝 Định dạng tên file</label>
+        <input type="text" id="setting-format" placeholder="{title} - {artist}">
+        <div class="hint">
+          Các biến có thể dùng:<br>
+          <code>{title}</code> = Tên bài hát &nbsp;
+          <code>{artist}</code> = Tên tác giả<br>
+          <code>{source}</code> = Nguồn (Zing MP3, NCT...)<br>
+          Mặc định: <code>{title} - {artist}</code><br>
+          Ví dụ kết quả: <code>Em Của Ngày Hôm Qua - Sơn Tùng MTP.zip</code>
+        </div>
+      </div>
+
+      <button id="btn-save-settings" class="btn-save-settings">💾 Lưu cài đặt</button>
+    </div>
+  </div>
+
+  <div class="footer">Mỗi bài = 1 file ZIP chứa nhạc + lời + thông tin</div>
+
+  <script src="zip.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

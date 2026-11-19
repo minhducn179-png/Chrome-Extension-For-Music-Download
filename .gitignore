@@ -1,0 +1,13 @@
+# Git ignore cho du an Music & Lyric Collector
+
+# Bo qua thu muc chua du lieu nhac cuc bo
+data/
+dataset_music/
+*.zip
+
+# File tam he thong
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.log
